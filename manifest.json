@@ -1,0 +1,23 @@
+{
+    "name": "Insta Searcher",
+    "version": "0.1.0",
+    "author": "Jean Loui Bernard Silva de Jesus",
+    "description": "Create a search bar to find followers or people you're following.",
+    "manifest_version": 2,
+    "icons": {
+        "128": "images/icon128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.instagram.com/*"
+            ],
+            "js": [
+                "src/content.js"
+            ],
+            "css": [
+                "css/style.css"
+            ]
+        }
+    ]
+}
