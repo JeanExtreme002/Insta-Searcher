@@ -1,5 +1,36 @@
 var searching = false;
 
+async function loadProfiles(ul) {
+
+    // Obtém o título da janela.
+    const h1 = document.querySelectorAll("h1")[1];
+    const title = h1.innerText;
+
+    // Obtém o elemento que possui o número de perfis da lista a serem carregados.
+    const element = [...document.querySelectorAll("section ul li a")].filter((element) => {
+        return element.innerText.toLowerCase().indexOf(title.toLowerCase()) !== -1;
+    });
+
+    // Obtém a quantidade de perfis da lista.
+    const length = parseInt(element[0].children[0].innerText.replace(".", ""));
+
+    // Verifica se a lista carregou por completo, ou usuário pediu a sua parada.
+    while (searching && ul.querySelectorAll("li").length < length - 1) {
+
+        // Rola até o final da lista.
+        const items = ul.querySelectorAll("li");
+        items[items.length - 1].scrollIntoView();
+
+        // Informa quantos perfis foram carregados.
+        h1.innerText = `${title} (loading... ${items.length})`;
+
+        // Espera um tempo em segundos
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    h1.innerText = title;
+}
+
 function changeSearchStatus(button, status) {
 
     // Inicia ou para a busca.
@@ -38,6 +69,13 @@ function createSearchBar(ul_element) {
     ul_element.prepend(search_bar);
 }
 
+function getProfile() {
+    
+    // Retorna o nome de usuário da página atual.
+    const username = document.title.match(/\(@(\S+)\)/)[1];
+    return username;
+}
+
 function main() {
 
     // Obtém todos os elementos de UL e a barra de busca.
@@ -46,7 +84,7 @@ function main() {
 
     // Verifica se o usuário clicou em "Followers" ou "Following" e se 
     // existe ou não uma search bar criada para a UL. Se não existir, ela será criada.
-    if (following_list && !search_bar) {
+    if (following_list && !search_bar && document.querySelectorAll("h1").length === 2) {
         createSearchBar(following_list);
     }
 }
@@ -86,7 +124,7 @@ function searchProfiles(ul, name) {
     return items;
 }
 
-function search() {
+async function search() {
 
     // Obtém o botão que foi clicado, a lista e o nome que será procurado.
     const button = event.target;
@@ -104,6 +142,9 @@ function search() {
     if (!username || !searching) {
         return changeSearchStatus(button, false);
     }
+
+    // Carrega a lista por completo.
+    await loadProfiles(list, username);
 
     // Obtém os perfis e troca a cor de background deles.
     const profiles = searchProfiles(list, username);
